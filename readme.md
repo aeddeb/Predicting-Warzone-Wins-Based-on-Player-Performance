@@ -2,4 +2,4 @@ In this project, I will be exploring what factors lead to more wins on COD Warzo
 
 I would like to create a model that can predict the probability a person can win games based on their skill, playstyle and stats. Then, I could make recommendations on how to improve to increase the likelihood of winning Warzone matches.
 
-I will be collecting player stats from codstats.net by creating a scraper.
+I will be collecting player stats from cod.tracker.gg by creating a scraper.

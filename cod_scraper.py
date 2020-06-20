@@ -24,7 +24,7 @@ Then, need a way to match the metric to the player and only have 1 instance of t
 import requests
 from bs4 import BeautifulSoup
 
-url = 'https://cod.tracker.gg/warzone/leaderboards/battle-royale/all/WlRatio?page='
+url = 'https://cod.tracker.gg/warzone/leaderboards/battle-royale/all/Wins?page='
 
 #can later use a loop to go through the pages
 page_num = str(1)
@@ -33,4 +33,11 @@ page = requests.get(url + page_num)
 
 soup = BeautifulSoup(page.content, 'html.parser')
 
-# need to select row and extract console, player name, win % and Matches Played
+
+# ----------------------------------------------------------------------------
+# Need to select row and extract console, player name, wins and Matches Played
+
+#each row of player data has a tr tag
+soup.find_all('tr')
+
+#have to figure out how to deal with duplicates

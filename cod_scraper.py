@@ -38,6 +38,28 @@ soup = BeautifulSoup(page.content, 'html.parser')
 # Need to select row and extract console, player name, wins and Matches Played
 
 #each row of player data has a tr tag
-soup.find_all('tr')
+data = soup.find_all('tr')
+#removing first row which is just the table heading
+del data[0]
 
-#have to figure out how to deal with duplicates
+#for each player on the page...
+for player in data:
+    
+    #...get username, wins, matches played (mp) and platform
+    username = player.find('span', attrs = {'class':'trn-ign__username'}).text
+    wins = int((player.find('td', attrs = {'class':'stat'}).text).replace(',',''))
+    mp = int((player.find('td', attrs = {'class':'stat collapse'}).text).replace(',',''))
+    platform = (player.find('svg')['class'][-1]).replace('platform-','')
+    print(username, wins, mp, platform, round(wins/mp,3))
+
+    
+'''
+Next tasks:
+1. Have to figure out how to deal with duplicates
+- if a duplicate exists, remove the activision account as it does not tell us which
+platform the player is on
+
+2. Save the data that is being collected (pd DataFrame?, np.array?)
+
+3. Cycle through pages and collecting the info 
+'''

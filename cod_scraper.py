@@ -42,6 +42,9 @@ data = soup.find_all('tr')
 #removing first row which is just the table heading
 del data[0]
 
+platform_classes = ['platform-icon platform-icon platform-atvi', 'platform-icon platform-icon platform-battlenet',
+                    'platform-icon platform-icon platform-xbl', 'platform-icon platform-icon platform-psn']
+
 #for each player on the page...
 for player in data:
     
@@ -49,7 +52,9 @@ for player in data:
     username = player.find('span', attrs = {'class':'trn-ign__username'}).text
     wins = int((player.find('td', attrs = {'class':'stat'}).text).replace(',',''))
     mp = int((player.find('td', attrs = {'class':'stat collapse'}).text).replace(',',''))
-    platform = (player.find('svg')['class'][-1]).replace('platform-','')
+    #there are many tags with svg (e.g. rank, twitch icon) so needed to specify class; then selected class 
+    #and removed irrelevant info, leaving only the platform name
+    platform = (player.find('svg', attrs= {'class':platform_classes})['class'][-1]).replace('platform-','')
     print(username, wins, mp, platform, round(wins/mp,3))
 
     

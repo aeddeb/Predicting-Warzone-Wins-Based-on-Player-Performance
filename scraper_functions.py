@@ -3,17 +3,26 @@
 Created on Mon Jun 22 15:43:55 2020
 
 @author: ali_e
+
+Saving all functions for scraping in this py file
 """
 
-
-def get_wins(data, win_data):
+# 1. Extracting win data per player and saving it into a nested list
+def get_wins(data, win_data = [['username','platform','wins','matches played']]):
     '''
+    Get win data for each player from a scraped page from cod.tracker.gg.
+    
     Parameters
     ----------
     data : BeautifulSoup ResultSet
-        Contains the player info that was scraped from the web.
+        Contains the player info that was scraped from the wins leaderboard.
     win_data : List
         Extracted elements are appended to this win_data list.
+        For each player in data, the following is extracted:
+            1. Username
+            2. Wins
+            3. Matches Played
+            4. Platform (e.g. playstation, Xbox)
 
     Returns
     -------
@@ -36,17 +45,19 @@ def get_wins(data, win_data):
         platform = (data[player].find('svg', attrs= {'class':platform_classes})['class'][-1]).replace('platform-','')
         
         
-        #need to get previous player username and wins to check for duplicates (refer to elif statement below) except for the first player
-        if player != 0:
-            previous_p = data[player - 1].find('span', attrs = {'class':'trn-ign__username'}).text.lower()
-            previous_w = int((data[player - 1].find('td', attrs = {'class':'stat'}).text).replace(',',''))
+        #need to get previous player username and wins to check for duplicates (refer to elif statement below)
+        #previous_p = data[player - 1].find('span', attrs = {'class':'trn-ign__username'}).text.lower()
+        #previous_w = int((data[player - 1].find('td', attrs = {'class':'stat'}).text).replace(',',''))
+        
+        previous_p = (win_data[-1][0]).lower()
+        previous_w = win_data[-1][2]
         
         #if first player, put their info into the list as no duplicates are possible at this point
         if player == 0:
             win_data.append([username,platform,wins,mp])
        
-        #checking for duplicates by looking at username and number of wins
-        elif ((username.lower() in previous_p) or (previous_p in username.lower())) and (wins == previous_w):
+        #checking for duplicates by looking at username and number of wins (number of wins may be off by up to 5 as database updates)
+        elif ((username.lower() in previous_p) or (previous_p in username.lower())) and (wins - previous_w in range(-5,6)):
             #if platform is not activision, then one of the main 3 platforms is already identified
             if win_data[-1][1] != 'atvi':
                 continue
@@ -58,4 +69,4 @@ def get_wins(data, win_data):
         else:
             win_data.append([username,platform,wins,mp])
             
-        return win_data
+    return win_data

@@ -6,15 +6,13 @@ Created on Sat Jun 20 03:48:07 2020
 
 Goals:
     
-1. Extract name, player console and value for metric for 1 page.
+1. Extract name, player, platform and value for metric for 1 page.
 
 2. Figure out where to store the above data.
 
 3. Figure out how to go to the next page.
 
 4. Repeat steps 1-3.
-
-_______________________________________________________________________________
 
 After, need to get other metrics (figure out which ones are needed).
 
@@ -64,9 +62,10 @@ for player in range(len(data)):
     #print(username, wins, mp, platform)
     
     
-    #need to get previous player username and wins to check for duplicates (refer to elif statement below)
-    previous_p = data[player - 1].find('span', attrs = {'class':'trn-ign__username'}).text.lower()
-    previous_w = int((data[player - 1].find('td', attrs = {'class':'stat'}).text).replace(',',''))
+    #need to get previous player username and wins to check for duplicates (refer to elif statement below) except for the first player
+    if player != 0:
+        previous_p = data[player - 1].find('span', attrs = {'class':'trn-ign__username'}).text.lower()
+        previous_w = int((data[player - 1].find('td', attrs = {'class':'stat'}).text).replace(',',''))
     
     #if first player, put their info into the list as no duplicates are possible at this point
     if player == 0:

@@ -24,6 +24,7 @@ from bs4 import BeautifulSoup
 
 url = 'https://cod.tracker.gg/warzone/leaderboards/battle-royale/all/Wins?page='
 
+
 #can later use a loop to go through the pages
 page_num = str(1)
 
@@ -91,6 +92,7 @@ for player in range(len(data)):
 Next tasks:
 
 2. Save the data that is being collected (pd DataFrame?, np.array?)
+-save in a nested list; then put into dataFrame
 
 3. Cycle through pages and collecting the info 
 

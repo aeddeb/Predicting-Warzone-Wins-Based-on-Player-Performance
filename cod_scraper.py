@@ -42,29 +42,92 @@ data = soup.find_all('tr')
 #removing first row which is just the table heading
 del data[0]
 
+#platform classes associated with svg tag
+#need this list to ensure the platform tag is selected in the following for loop
 platform_classes = ['platform-icon platform-icon platform-atvi', 'platform-icon platform-icon platform-battlenet',
                     'platform-icon platform-icon platform-xbl', 'platform-icon platform-icon platform-psn']
 
+#going to save win data per player as a list of lists which can later be put in a pd DataFrame
+#initializing main list
+win_data = []
+
 #for each player on the page...
-for player in data:
+for player in range(len(data)):
     
     #...get username, wins, matches played (mp) and platform
-    username = player.find('span', attrs = {'class':'trn-ign__username'}).text
-    wins = int((player.find('td', attrs = {'class':'stat'}).text).replace(',',''))
-    mp = int((player.find('td', attrs = {'class':'stat collapse'}).text).replace(',',''))
-    #there are many tags with svg (e.g. rank, twitch icon) so needed to specify class; then selected class 
+    username = data[player].find('span', attrs = {'class':'trn-ign__username'}).text
+    wins = int((data[player].find('td', attrs = {'class':'stat'}).text).replace(',',''))
+    mp = int((data[player].find('td', attrs = {'class':'stat collapse'}).text).replace(',',''))
+    #there are many svg tags (e.g. rank, twitch icon) so needed to specify class; then selected class 
     #and removed irrelevant info, leaving only the platform name
-    platform = (player.find('svg', attrs= {'class':platform_classes})['class'][-1]).replace('platform-','')
-    print(username, wins, mp, platform, round(wins/mp,3))
-
+    platform = (data[player].find('svg', attrs= {'class':platform_classes})['class'][-1]).replace('platform-','')
+    #print(username, wins, mp, platform)
+    
+    
+    #need to get previous player username and wins to check for duplicates (refer to elif statement below)
+    previous_p = data[player - 1].find('span', attrs = {'class':'trn-ign__username'}).text.lower()
+    previous_w = int((data[player - 1].find('td', attrs = {'class':'stat'}).text).replace(',',''))
+    
+    #if first player, put their info into the list as no duplicates are possible at this point
+    if player == 0:
+        win_data.append([username,wins,mp,platform])
+   
+    #checking for duplicates by looking at username and nummber of wins
+    elif ((username.lower() in previous_p) or (previous_p in username.lower())) and (wins == previous_w):
+        #if platform is not activision, then one of the main 3 platforms is already identified
+        if win_data[-1][3] != 'atvi':
+            continue
+        #if not, get the relevant platform used by the player
+        else:
+            win_data[-1][3] = platform
+   
+    #if no duplicate exists, simply append their info to the win_data list
+    else:
+        win_data.append([username,wins,mp,platform])
+    
     
 '''
 Next tasks:
-1. Have to figure out how to deal with duplicates
-- if a duplicate exists, remove the activision account as it does not tell us which
-platform the player is on
 
 2. Save the data that is being collected (pd DataFrame?, np.array?)
 
 3. Cycle through pages and collecting the info 
+
+Completed:
+    1. Have to figure out how to deal with duplicates [DONE]
+    - if a duplicate exists, remove the activision account as it does not tell us which
+    platform the player is on
 '''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

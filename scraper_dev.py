@@ -49,8 +49,9 @@ platform_classes = ['platform-icon platform-icon platform-atvi', 'platform-icon 
 
 #going to save win data per player as a list of lists which can later be put in a pd DataFrame
 #initializing main list
-win_data = []
+win_data = [['username','platform','wins','matches played']]
 
+player_dict = {}
 
 #for each player on the page...
 for player in range(len(data)):
@@ -64,18 +65,32 @@ for player in range(len(data)):
     platform = (data[player].find('svg', attrs= {'class':platform_classes})['class'][-1]).replace('platform-','')
     #print(username, wins, mp, platform)
     
+    #getting lower case username for matching
+    username_l = username.lower()
+    #determining if player should be added to win_data or not; by default, it is True unless a duplicate exists
+    add_player = True
     
-    #need to get previous player username and wins to check for duplicates (refer to elif statement below) except for the first player
-    if player != 0:
-        previous_p = data[player - 1].find('span', attrs = {'class':'trn-ign__username'}).text.lower()
-        previous_w = int((data[player - 1].find('td', attrs = {'class':'stat'}).text).replace(',',''))
+    #if the player already exists in the player_dict, then we will not add them to the dict or list but we will update
+    #their platform to reflect one of the 3 main ones
+    if username_l in player_dict:
+        add_player = False
+        #...change the platform if the current one is atvi...
+        if player_dict[username_l][0] == 'atvi':
+            player_dict[username_l] = [platform, wins]
+        #...or don't if it is not atvi
+        else:
+            continue
+    #if user is not in dict, add them to dict
+    else:
+        player_dict[username_l] = [platform, wins]
     
-    #if first player, put their info into the list as no duplicates are possible at this point
-    if player == 0:
-        win_data.append([username,platform,wins,mp])
+    
+    #need to get previous player username and wins to check for duplicates (refer to elif statement below)
+    previous_p = data[player - 1].find('span', attrs = {'class':'trn-ign__username'}).text.lower()
+    previous_w = int((data[player - 1].find('td', attrs = {'class':'stat'}).text).replace(',',''))
    
     #checking for duplicates by looking at username and number of wins
-    elif ((username.lower() in previous_p) or (previous_p in username.lower())) and (wins == previous_w):
+    if ((username.lower() in previous_p) or (previous_p in username.lower())) and (wins - previous_w in range(-5,6)):
         #if platform is not activision, then one of the main 3 platforms is already identified
         if win_data[-1][1] != 'atvi':
             continue
@@ -83,11 +98,20 @@ for player in range(len(data)):
         else:
             win_data[-1][1] = platform
    
-    #if no duplicate exists, simply append their info to the win_data list
+    #if no proximate duplicate exists, check that there is no duplicate in the dict and appends their info to the win_data list
     else:
-        win_data.append([username,platform,wins,mp])
-    
-    
+        #if duplicate exists, do not add the player again but make sure the relevant platform is included in the list
+        if add_player == False:
+            #checking win_data in reverse for the duplicate and then updating the player's platform to the relevant one
+            for index in range(len(win_data)-1,-1,-1):
+                #print(win_data, len(win_data), index)
+                if win_data[index][0].lower() == username_l:
+                    win_data[index][1] = player_dict[username_l][0]
+                    break
+        #if no duplicate exists, add the player to the win_data list
+        else:
+            win_data.append([username,platform,wins,mp])
+
 '''
 Next tasks:
 
@@ -101,9 +125,6 @@ Completed:
     - if a duplicate exists, remove the activision account as it does not tell us which
     platform the player is on
 '''
-
-
-
 
 
 

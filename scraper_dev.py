@@ -6,13 +6,17 @@ Created on Sat Jun 20 03:48:07 2020
 
 Goals:
     
-1. Extract name, player, platform and value for metric for 1 page.
+1. Extract name, player, platform and value for metric for 1 page. [Done]
+-for loop below --> converted to function in scraper_functions.py
 
-2. Figure out where to store the above data.
+2. Figure out where to store the above data. [Done]
+-temporarily in nested list; then place into Pandas DataFrame
 
-3. Figure out how to go to the next page.
+3. Figure out how to go to the next page. [Done]
+-cycle through page
 
-4. Repeat steps 1-3.
+4. Repeat steps 1-3. 
+-will be developed in cod_scraper.py
 
 After, need to get other metrics (figure out which ones are needed).
 
@@ -21,6 +25,10 @@ Then, need a way to match the metric to the player and only have 1 instance of t
 
 import requests
 from bs4 import BeautifulSoup
+from fuzzywuzzy import fuzz
+
+# ----------------------------------------------------------------------------
+
 
 url = 'https://cod.tracker.gg/warzone/leaderboards/battle-royale/all/Wins?page='
 
@@ -85,11 +93,11 @@ for player in range(len(data)):
         player_dict[username_l] = [platform, wins]
     
     
-    #need to get previous player username and wins to check for duplicates (refer to elif statement below)
-    previous_p = data[player - 1].find('span', attrs = {'class':'trn-ign__username'}).text.lower()
-    previous_w = int((data[player - 1].find('td', attrs = {'class':'stat'}).text).replace(',',''))
+    #need to get previous player's (in win_data list) username and wins to check for duplicates (refer to elif statement below)
+    previous_p = win_data[-1][0].lower()
+    previous_w = win_data[-1][2]
    
-    #checking for duplicates by looking at username and number of wins
+    #checking for proximate duplicates by looking at username and number of wins
     if ((username.lower() in previous_p) or (previous_p in username.lower())) and (wins - previous_w in range(-5,6)):
         #if platform is not activision, then one of the main 3 platforms is already identified
         if win_data[-1][1] != 'atvi':
@@ -105,7 +113,7 @@ for player in range(len(data)):
             #checking win_data in reverse for the duplicate and then updating the player's platform to the relevant one
             for index in range(len(win_data)-1,-1,-1):
                 #print(win_data, len(win_data), index)
-                if win_data[index][0].lower() == username_l:
+                if win_data[index][0].lower() in username_l:
                     win_data[index][1] = player_dict[username_l][0]
                     break
         #if no duplicate exists, add the player to the win_data list
@@ -126,13 +134,18 @@ Completed:
     platform the player is on
 '''
 
+#Looking for optimal ratio to include in above for loop when searching for duplicates
+fuzz.ratio("TeePee", "TeePee__")
+fuzz.partial_ratio("TeePee", "TeePee__")
+fuzz.token_sort_ratio("TeePee", "TeePee__")
 
+fuzz.ratio("zZReaper_Zz", "Reaper Gameplays")
+fuzz.partial_ratio("zZReaper_Zz", "Reaper Gameplays")
+fuzz.token_sort_ratio("zZReaper_Zz", "Reaper Gameplays")
 
-
-
-
-
-
+fuzz.ratio("The GaGOD", "GaGOD")
+fuzz.partial_ratio("The GaGOD", "GaGOD")
+fuzz.token_sort_ratio("The GaGOD", "GaGOD")
 
 
 

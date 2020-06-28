@@ -56,8 +56,9 @@ platform_classes = ['platform-icon platform-icon platform-atvi', 'platform-icon 
                     'platform-icon platform-icon platform-xbl', 'platform-icon platform-icon platform-psn']
 
 #going to save win data per player as a list of lists which can later be put in a pd DataFrame
-#initializing main list
-win_data = [['username','platform','wins','matches played']]
+#initializing main win list with header and an example row 
+win_data = [['username','platform','wins','matches played'],
+            ['example','psn',22,10000000000]]
 
 player_dict = {}
 
@@ -80,43 +81,18 @@ for player in range(len(data)):
         username = username.split('#')[0]
 
     
+    
     #getting lower case username for matching
-    username_l = username.lower()
-    #determining if player should be added to win_data or not; by default, it is True unless a duplicate exists
-    add_player = True
-    #need empty dictionary to store player info if duplicate exists in player_dict below
-    temp_dict = {}
-    
-    #if the player already exists in the player_dict, then we will not add them to the dict or list but we will update
-    #their platform to reflect one of the 3 main ones
-    
-    for key, value in player_dict.items():
-    
-        if fuzz.ratio(username_l, key) > 30 and wins - value[1] in range(-10,11) and platform != value[0] and mp - value[2] in range(-30,31):
-            temp_dict[key] = value
-    
-    if len(temp_dict) == 1:
-        add_player = False
-        player_alt = list(temp_dict.keys())[0]
-        #...change the platform if the current one is atvi...
-        if player_dict[player_alt][0] == 'atvi':
-            player_dict[player_alt] = [platform, wins, mp]
-        #...or don't if it is not atvi
-        else:
-            continue
-    elif len(temp_dict) > 1:
-        print(f'More than one match for username: {username_l}')
-    #if user is not in dict, add them to dict
-    else:
-        player_dict[username_l] = [platform, wins, mp]
-    
+    username_l = username.lower()   
     
     #need to get previous player's (in win_data list) username and wins to check for duplicates (refer to elif statement below)
-    previous_p = win_data[-1][0].lower()
+    previous_u = win_data[-1][0].lower()
     previous_w = win_data[-1][2]
-   
-    #checking for proximate duplicates by looking at username and number of wins
-    if ((username.lower() in previous_p) or (previous_p in username.lower())) and (wins - previous_w in range(-5,6)):
+    previous_p = win_data[-1][1]
+    previous_mp = win_data[-1][3]
+    
+    #checking for proximate duplicates by looking at username, platform, number of wins and matches played
+    if fuzz.ratio(username_l, previous_u) > 30 and wins - previous_w in range(-5,5) and platform != previous_p and mp - previous_mp in range(-25,25):
         #if platform is not activision, then one of the main 3 platforms is already identified
         if win_data[-1][1] != 'atvi':
             continue
@@ -126,6 +102,35 @@ for player in range(len(data)):
    
     #if no proximate duplicate exists, check that there is no duplicate in the dict and appends their info to the win_data list
     else:
+        
+        #determining if player should be added to win_data or not; by default, it is True unless a duplicate exists
+        add_player = True
+        #need empty dictionary to store player info if duplicate exists in player_dict below
+        temp_dict = {}
+    
+        #checking if player exists in player_dict
+        for key, value in player_dict.items():
+            #if yes, add them to the temp_dict
+            if fuzz.ratio(username_l, key) > 30 and wins - value[1] in range(-10,11) and platform != value[0] and mp - value[2] in range(-30,31):
+                temp_dict[key] = value
+        
+        if len(temp_dict) == 1:
+            add_player = False
+            player_alt = list(temp_dict.keys())[0]
+            #...change the platform if the current one is atvi...
+            if player_dict[player_alt][0] == 'atvi':
+                player_dict[player_alt] = [platform, wins, mp]
+            #...or don't if it is not atvi
+            else:
+                continue
+        elif len(temp_dict) > 1:
+            print(f'More than one match for username: {username_l}')
+        #if user is not in dict, add them to dict
+        else:
+            player_dict[username_l] = [platform, wins, mp]
+        
+        
+        
         #if duplicate exists, do not add the player again but make sure the relevant platform is included in the list
         if add_player == False:
             #checking win_data in reverse for the duplicate and then updating the player's platform to the relevant one
@@ -182,6 +187,7 @@ fuzzy_score("Mmafighter210", " Mma fighter 210")
 fuzzy_score('PiggyTony', 'Mixcn')
 
 fuzzy_score('basher', 'baysoldier')
+
 '''
 We can remove a duplicate by assessing 4 criteria:
     - they have above 30 ratio score

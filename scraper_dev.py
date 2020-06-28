@@ -84,13 +84,13 @@ for player in range(len(data)):
         add_player = False
         #...change the platform if the current one is atvi...
         if player_dict[username_l][0] == 'atvi':
-            player_dict[username_l] = [platform, wins]
+            player_dict[username_l] = [platform, wins, mp]
         #...or don't if it is not atvi
         else:
             continue
     #if user is not in dict, add them to dict
     else:
-        player_dict[username_l] = [platform, wins]
+        player_dict[username_l] = [platform, wins, mp]
     
     
     #need to get previous player's (in win_data list) username and wins to check for duplicates (refer to elif statement below)
@@ -120,46 +120,66 @@ for player in range(len(data)):
         else:
             win_data.append([username,platform,wins,mp])
 
-'''
-Next tasks:
 
-2. Save the data that is being collected (pd DataFrame?, np.array?)
--save in a nested list; then put into dataFrame
 
-3. Cycle through pages and collecting the info 
 
-Completed:
-    1. Have to figure out how to deal with duplicates [DONE]
-    - if a duplicate exists, remove the activision account as it does not tell us which
-    platform the player is on
-'''
 
 #Looking for optimal ratio to include in above for loop when searching for duplicates
-fuzz.ratio("TeePee", "TeePee__")
-fuzz.partial_ratio("TeePee", "TeePee__")
-fuzz.token_sort_ratio("TeePee", "TeePee__")
+def fuzzy_score(token_1, token_2):
+    t1_l = token_1.lower()
+    t2_l = token_2.lower()
+    r = fuzz.ratio(token_1, token_2)
+    r_l = fuzz.ratio(t1_l, t2_l)
+    pr = fuzz.partial_ratio(token_1, token_2)
+    pr_l = fuzz.partial_ratio(t1_l, t2_l)
+    tsr = fuzz.token_sort_ratio(token_1, token_2)
+    tsr_l = fuzz.token_sort_ratio(t1_l, t2_l)
+    print(f'Token 1: {token_1}')
+    print(f'Token 2: {token_2}')
+    print('                  U  | L')
+    print(f'Ratio:            {r} , {r_l}')
+    print(f'Partial ratio:    {pr} , {pr_l}')
+    print(f'Token sort Ratio: {tsr} , {tsr_l}')
+    print()
 
-fuzz.ratio("zZReaper_Zz", "Reaper Gameplays")
-fuzz.partial_ratio("zZReaper_Zz", "Reaper Gameplays")
-fuzz.token_sort_ratio("zZReaper_Zz", "Reaper Gameplays")
+fuzzy_score('TeePee', 'TeePee__')
 
-fuzz.ratio("The GaGOD", "GaGOD")
-fuzz.partial_ratio("The GaGOD", "GaGOD")
-fuzz.token_sort_ratio("The GaGOD", "GaGOD")
+fuzzy_score("zZReaper_Zz", "Reaper Gameplays")
 
+fuzzy_score("The GaGod", "GaGod")
 
+fuzzy_score("ShuKz", "TBG_ShuKz")
 
+fuzzy_score("sWKiller9086", "sW Kout")
 
+fuzzy_score("Antoinejuif", "antoine_le_JUIF")
 
+fuzzy_score("CCaNaDa", "CaNaDeeZy")
 
+fuzzy_score("MerK_JJD", "merkjjd")
 
+fuzzy_score("Mmafighter210", " Mma fighter 210")
 
+#trying two different players with similar wins and same console
+fuzzy_score('PiggyTony', 'Mixcn')
 
+fuzzy_score('basher', 'baysoldier')
+'''
+We can remove a duplicate by assessing 3/4 criteria:
+    - they have above 30 ratio score
+    - they have similar number of wins (+/-5)
+    - they have different platforms
+    - main differentiator: number of matches played (within range of 25)
 
+Possible solution:
+    We create a temporary dictionary that is filtered from the main player_dict
+    using the criteria mentioned above.
+    
+    The temp dict should have a length of 1 only if there is a player that meets those conditions.
+    Then we can remove duplicate,
+    If no duplicate found, skip
 
-
-
-
+'''
 
 
 

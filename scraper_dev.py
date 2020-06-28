@@ -71,23 +71,41 @@ for player in range(len(data)):
     #there are many svg tags (e.g. rank, twitch icon) so needed to specify class; then select class 
     #and remove irrelevant info, leaving only the platform name
     platform = (data[player].find('svg', attrs= {'class':platform_classes})['class'][-1]).replace('platform-','')
-    #print(username, wins, mp, platform)
+    #for username, need to check if the player is on activision or not...
+    if platform != 'atvi':
+        username = data[player].find('span', attrs = {'class':'trn-ign__username'}).text
+    #...if not, we need to remove the special number identifier at the end and retain just the original username
+    else:
+        username = data[player].find('span', attrs = {'class':'trn-ign__username'}).text
+        username = username.split('#')[0]
+
     
     #getting lower case username for matching
     username_l = username.lower()
     #determining if player should be added to win_data or not; by default, it is True unless a duplicate exists
     add_player = True
+    #need empty dictionary to store player info if duplicate exists in player_dict below
+    temp_dict = {}
     
     #if the player already exists in the player_dict, then we will not add them to the dict or list but we will update
     #their platform to reflect one of the 3 main ones
-    if username_l in player_dict:
+    
+    for key, value in player_dict.items():
+    
+        if fuzz.ratio(username_l, key) > 30 and wins - value[1] in range(-10,11) and platform != value[0] and mp - value[2] in range(-30,31):
+            temp_dict[key] = value
+    
+    if len(temp_dict) == 1:
         add_player = False
+        player_alt = list(temp_dict.keys())[0]
         #...change the platform if the current one is atvi...
-        if player_dict[username_l][0] == 'atvi':
-            player_dict[username_l] = [platform, wins, mp]
+        if player_dict[player_alt][0] == 'atvi':
+            player_dict[player_alt] = [platform, wins, mp]
         #...or don't if it is not atvi
         else:
             continue
+    elif len(temp_dict) > 1:
+        print(f'More than one match for username: {username_l}')
     #if user is not in dict, add them to dict
     else:
         player_dict[username_l] = [platform, wins, mp]
@@ -113,8 +131,8 @@ for player in range(len(data)):
             #checking win_data in reverse for the duplicate and then updating the player's platform to the relevant one
             for index in range(len(win_data)-1,-1,-1):
                 #print(win_data, len(win_data), index)
-                if win_data[index][0].lower() in username_l:
-                    win_data[index][1] = player_dict[username_l][0]
+                if win_data[index][0].lower() == player_alt:
+                    win_data[index][1] = player_dict[player_alt][0]
                     break
         #if no duplicate exists, add the player to the win_data list
         else:
@@ -165,7 +183,7 @@ fuzzy_score('PiggyTony', 'Mixcn')
 
 fuzzy_score('basher', 'baysoldier')
 '''
-We can remove a duplicate by assessing 3/4 criteria:
+We can remove a duplicate by assessing 4 criteria:
     - they have above 30 ratio score
     - they have similar number of wins (+/-5)
     - they have different platforms
@@ -180,6 +198,47 @@ Possible solution:
     If no duplicate found, skip
 
 '''
+
+'''
+OLD CODE:
+if username_l in player_dict:
+    add_player = False
+    #...change the platform if the current one is atvi...
+    if player_dict[username_l][0] == 'atvi':
+        player_dict[username_l] = [platform, wins, mp]
+    #...or don't if it is not atvi
+    else:
+        continue
+#if user is not in dict, add them to dict
+else:
+    player_dict[username_l] = [platform, wins, mp]
+'''
+
+#creating new temp dict to hold filtered values
+temp_dict = {}
+
+name = 'zZReaper_Zz'
+wins = 795
+mp = 2356
+platform = 'psn'
+
+for key, value in player_dict.items():
+    
+    if fuzz.ratio(name, key) > 30 and wins - value[1] in range(-5,6) and platform != value[0] and mp - value[2] in range(-25,26):
+        temp_dict[key] = value
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

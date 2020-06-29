@@ -8,7 +8,7 @@ Saving all functions for scraping in this py file
 """
 
 # 1. Extracting win data per player and saving it into a nested list
-def get_wins(data, platform, win_data = [['username','platform','wins','matches played']]):
+def get_wins(data, platform, win_data):
     '''
     Get win data for each player from a scraped page from cod.tracker.gg.
     
@@ -29,26 +29,32 @@ def get_wins(data, platform, win_data = [['username','platform','wins','matches 
     Returns
     -------
     win_data
+    
+    Notes
+    -----
+    A header that can be used for win list: [['username','platform','wins','matches played']]
     '''
     
     #for each player on the page...
     for player in range(len(data)):
         
         #...get username, wins, matches played (mp) and platform
-        username = data[player].find('span', attrs = {'class':'trn-ign__username'}).text
         wins = int((data[player].find('td', attrs = {'class':'stat'}).text).replace(',',''))
         mp = int((data[player].find('td', attrs = {'class':'stat collapse'}).text).replace(',',''))
-
         #for username, need to check if the player is on battlenet or not...
         if platform != 'battlenet':
             username = data[player].find('span', attrs = {'class':'trn-ign__username'}).text
         #...if not, we need to add the special player id onto the username to avoid duplicate names
         else:
-            username = data[player].find('span', attrs = {'class':'trn-ign__username'}).text 
-            player_id = data[player].find('span', attrs = {'class':'trn-ign__discriminator'}).text
-            username = username + player_id
-        
-    #add the players info to the win_data list
-    win_data.append([username,platform,wins,mp])
+            name = data[player].find('span', attrs = {'class':'trn-ign__username'}).text 
+            try:
+                player_id = data[player].find('span', attrs = {'class':'trn-ign__discriminator'}).text
+                username = name + player_id
+            except:
+                username = name
+                
+    
+        #add the players info to the win_data list
+        win_data.append([username,platform,wins,mp])
             
     return win_data

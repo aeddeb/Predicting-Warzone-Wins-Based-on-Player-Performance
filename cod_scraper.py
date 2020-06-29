@@ -21,17 +21,23 @@ Then, need a way to match the metric to the player and only have 1 instance of t
 
 import requests
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 #custom functions needed for scraping saved here
 import scraper_functions as sf
 
-platforms = ["psn", "xbl", "battlenet"]
+#-----------------------------------------------------------------------------
 
-for platform in platforms:
+platforms = {"psn":[['username','platform','wins','matches played']],
+             "xbl":[['username','platform','wins','matches played']],
+             "battlenet":[['username','platform','wins','matches played']]}
+
+for platform in tqdm(platforms.keys()):
+    
     url = f"https://cod.tracker.gg/warzone/leaderboards/battle-royale/{platform}/Wins?page="
 
 
-    for num in range(1,11):
+    for num in tqdm(range(1,4)):
 
         #getting page number
         page_num = str(num)
@@ -48,7 +54,7 @@ for platform in platforms:
         #removing first row which is just the table heading
         del data[0]
 
-        win_data = sf.get_wins(data)
+        platforms[platform] = sf.get_wins(data, platform, platforms[platform])
 
 
 

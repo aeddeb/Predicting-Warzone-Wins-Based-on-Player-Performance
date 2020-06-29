@@ -25,27 +25,30 @@ from bs4 import BeautifulSoup
 #custom functions needed for scraping saved here
 import scraper_functions as sf
 
-url = 'https://cod.tracker.gg/warzone/leaderboards/battle-royale/all/Wins?page='
+platform = ["psn", "xbl", "battlenet"]
+
+for x in platform:
+    url = "https://cod.tracker.gg/warzone/leaderboards/%s/all/Wins?page=" % (x)
 
 
-for num in range(1,11):
-    
-    #getting page number
-    page_num = str(num)
-    
-    page = requests.get(url + page_num)
-    
-    soup = BeautifulSoup(page.content, 'html.parser')
-    
-    # ----------------------------------------------------------------------------
-    # Need to select row and extract console, player name, wins and Matches Played
-    
-    #each row of player data has a tr tag
-    data = soup.find_all('tr')
-    #removing first row which is just the table heading
-    del data[0]
-    
-    win_data = sf.get_wins(data)
+    for num in range(1,11):
+
+        #getting page number
+        page_num = str(num)
+
+        page = requests.get(url + page_num)
+
+        soup = BeautifulSoup(page.content, 'html.parser')
+
+        # ----------------------------------------------------------------------------
+        # Need to select row and extract console, player name, wins and Matches Played
+
+        #each row of player data has a tr tag
+        data = soup.find_all('tr')
+        #removing first row which is just the table heading
+        del data[0]
+
+        win_data = sf.get_wins(data)
 
 
 

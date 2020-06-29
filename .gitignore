@@ -1,0 +1,8 @@
+#development files
+scraper_dev.py
+
+#irrelevant folder(s)
+/__pycache__/
+
+#other
+notes.txt

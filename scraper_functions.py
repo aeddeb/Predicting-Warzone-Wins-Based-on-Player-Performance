@@ -22,7 +22,7 @@ def get_wins(data, win_data = [['username','platform','wins','matches played']])
             1. Username
             2. Wins
             3. Matches Played
-            4. Platform (e.g. playstation, Xbox)
+            4. Platform (e.g. playstation)
 
     Returns
     -------

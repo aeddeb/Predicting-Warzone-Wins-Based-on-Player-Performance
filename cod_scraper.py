@@ -25,10 +25,10 @@ from bs4 import BeautifulSoup
 #custom functions needed for scraping saved here
 import scraper_functions as sf
 
-platform = ["psn", "xbl", "battlenet"]
+platforms = ["psn", "xbl", "battlenet"]
 
-for x in platform:
-    url = "https://cod.tracker.gg/warzone/leaderboards/%s/all/Wins?page=" % (x)
+for platform in platforms:
+    url = f"https://cod.tracker.gg/warzone/leaderboards/battle-royale/{platform}/Wins?page="
 
 
     for num in range(1,11):

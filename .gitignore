@@ -1,8 +1,9 @@
 #development files
 scraper_dev.py
 
-#irrelevant folder(s)
+#folder(s)
 /__pycache__/
+/data/
 
 #other
 notes.txt

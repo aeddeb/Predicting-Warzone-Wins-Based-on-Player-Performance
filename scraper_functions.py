@@ -66,17 +66,17 @@ def get_stat(data, platform, feature, scraped_data):
             mp = int((data[player].find('td', attrs = {'class':'stat collapse'}).text).replace(',',''))
             #add the players info to the win_data list
             #win_data.append([username,platform,wins,mp])
-            scraped_data[username] = [platform, wins, mp]
+            scraped_data[username] = {'platform' : platform, 'wins': wins, 'mp': mp}
         else:
             #...get other statistic
             stat = data[player].find('td', attrs = {'class':'stat'}).text
-            scraped_data[username] = [platform, stat]
+            scraped_data[username] = {'platform' : platform, feature : stat}
             
     return scraped_data
 
 
 
-def scrape_pages(platform, feature,  max_page, scraped_data, start=1):
+def scrape_pages(platform, feature, scraped_data, start=1, max_page = 10000):
     '''
     Cycle through pages of cod.tracker.gg and extract info.
     
@@ -134,7 +134,7 @@ def scrape_pages(platform, feature,  max_page, scraped_data, start=1):
             scraped_data = get_stat(data, platform, feature, scraped_data)
             
             #give status update to user every 20 pages
-            if num % 20 == 0:
+            if num % 2 == 0:
                 print(f'Successfully scraped page {num}')
             
             #increase page number
@@ -143,7 +143,7 @@ def scrape_pages(platform, feature,  max_page, scraped_data, start=1):
         #protect against errors by saving whatever data has already been collected
         except:
             print(f'Encountered error at page {num}')
-            return scraped_data 
+            break 
     
     print(f'Program ended at page {num} for {feature} on {platform}')    
     return scraped_data

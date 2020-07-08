@@ -1,5 +1,9 @@
-#development files
-scraper_dev.py
+#ignore py files...
+*.py
+
+#...except
+!cod_scraper.py
+!scraper_functions.py
 
 #folder(s)
 /__pycache__/

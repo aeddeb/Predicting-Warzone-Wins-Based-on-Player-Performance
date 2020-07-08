@@ -15,9 +15,10 @@ Example:
 import scraper_functions as sf
 import pickle
 import sys
+
 #-----------------------------------------------------------------------------
   
-#specify platform and feature
+#Specify platform and feature
 
 #options: 'psn', 'xbl', 'battlenet'
 platform = sys.argv[1]
@@ -26,8 +27,8 @@ platform = sys.argv[1]
 #example: 'Wins'
 feature = sys.argv[2]
 
-#getting data
-data = sf.scrape_pages(platform, feature,  {}, max_page = 8)
+#getting data (starting with empty dictionary)
+data = sf.scrape_pages(platform, feature,  {})
 
 #save data file into data directory
 with open("data/"+ platform + "_" + feature + ".pkl", "wb") as file:

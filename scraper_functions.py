@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup
 
 #FUNCTIONS
 #------------------------------------------------------------------------------
-# 1. Extracting win data per player and saving it into a nested list
+# 1. Extracting win data per player and saving it into a dictionary
 def get_stat(data, platform, feature, scraped_data):
     '''
     Get win data for each player from a scraped page from cod.tracker.gg.
@@ -76,7 +76,7 @@ def get_stat(data, platform, feature, scraped_data):
 
 
 
-def scrape_pages(platform, feature, scraped_data, start=1, max_page = 10000):
+def scrape_pages(platform, feature, scraped_data, start = 1, max_page = 10000):
     '''
     Cycle through pages of cod.tracker.gg and extract info.
     
@@ -134,7 +134,7 @@ def scrape_pages(platform, feature, scraped_data, start=1, max_page = 10000):
             scraped_data = get_stat(data, platform, feature, scraped_data)
             
             #give status update to user every 20 pages
-            if num % 2 == 0:
+            if num % 20 == 0:
                 print(f'Successfully scraped page {num}')
             
             #increase page number

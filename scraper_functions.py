@@ -146,8 +146,8 @@ def select_url(website, feature, platform):
             'KillsPerMin', 'DamageDone', 'DamageTaken', 'HeadshotsPercentage', 'TimeMoving', 'LastStandKills',
             'CachesOpened', 'KioskPurchases', 'TabletsPickedUp', 'TeamSurvival', or 'Revived'.  
     platform : str (Optional)
-        String of the desired platform. Only needed if website is cdtr.
-        Options:
+        String of the desired platform. Only needed if website is cdtr. Otherwise, not used.
+        Options for 'cdtr':
             'psn', 'xbl', or 'battlenet'. 
 
     Returns
@@ -185,7 +185,7 @@ def select_url(website, feature, platform):
 
 
 #4. Cycle through pages and extract player stats
-def scrape_pages(feature, scraped_data, website, platform = None, start = 1, max_page = 10000):
+def scrape_pages(website, feature, scraped_data, platform, start = 1, max_page = 10000):
     '''
     Cycle through pages of cod.tracker.gg and extract info.
     
@@ -224,8 +224,14 @@ def scrape_pages(feature, scraped_data, website, platform = None, start = 1, max
             #getting page number
             page_num = str(num)
             
+            #adding a user agent to avoid 403 errors
+            if num % 2 == 0:
+                user = 'Mozilla/5.0'
+            else:
+                user = 'Chrome/63.0.3239.132'
+
             #requestng page info
-            page = requests.get(url + page_num)
+            page = requests.get(url + page_num, headers={'User-Agent':user})
             
             #if we reach the end of the database in cod.tracker.gg, break from loop
             if website == 'cdtr':
@@ -278,5 +284,5 @@ def scrape_pages(feature, scraped_data, website, platform = None, start = 1, max
                 print(f'Encountered error at page {num}...stopped after 3 unsuccessful attempts')
                 break 
 
-    print(f'Program ended at page {num} for {feature} on {platform}')    
+    print(f'Program ended at page {num} for {feature} on {platform} platform(s)')    
     return scraped_data

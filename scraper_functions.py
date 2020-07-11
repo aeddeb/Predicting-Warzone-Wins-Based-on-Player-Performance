@@ -59,17 +59,10 @@ def get_stat_cdtr(data, platform, feature, scraped_data):
             except:
                 username = name
 
-        if feature == 'Wins':
-            #...get username, wins, matches played (mp) and platform
-            wins = int((data[player].find('td', attrs = {'class':'stat'}).text).replace(',',''))
-            mp = int((data[player].find('td', attrs = {'class':'stat collapse'}).text).replace(',',''))
-            #add the players info to the win_data list
-            #win_data.append([username,platform,wins,mp])
-            scraped_data[username] = {'platform' : platform, 'wins': wins, 'mp': mp}
-        else:
-            #...get other statistic
-            stat = data[player].find('td', attrs = {'class':'stat'}).text
-            scraped_data[username] = {'platform' : platform, feature : stat}
+        #...get username, stat, matches played (mp) and platform
+        stat = data[player].find('td', attrs = {'class':'stat'}).text
+        mp = int((data[player].find('td', attrs = {'class':'stat collapse'}).text).replace(',',''))
+        scraped_data[username] = {'platform' : platform, feature : stat, 'mp': mp}
             
     return scraped_data
 

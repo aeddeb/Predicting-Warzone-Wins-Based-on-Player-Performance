@@ -62,7 +62,7 @@ def get_stat_cdtr(data, platform, feature, scraped_data):
         #...get username, stat, matches played (mp) and platform
         stat = data[player].find('td', attrs = {'class':'stat'}).text
         mp = int((data[player].find('td', attrs = {'class':'stat collapse'}).text).replace(',',''))
-        scraped_data[username] = {'platform' : platform, feature : stat, 'mp': mp}
+        scraped_data[username] = {'platform' : platform, feature : stat, f'{feature}_mp': mp}
             
     return scraped_data
 

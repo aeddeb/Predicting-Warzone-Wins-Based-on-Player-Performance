@@ -9,6 +9,7 @@
 /__pycache__/
 /data/
 /.ipynb_checkpoints/
+/archive/
 
 #other
 notes.txt

@@ -279,6 +279,7 @@ def scrape_pages(website, feature, scraped_data, platform, start = 1, max_page =
                 print(f'Encountered error at page {num}...attempt to re-scrape #{retry}')
                 retry += 1
                 continue
+            #otherwise, break from loop
             else:
                 print(f'Encountered error at page {num}...stopped after 5 unsuccessful attempts')
                 break 

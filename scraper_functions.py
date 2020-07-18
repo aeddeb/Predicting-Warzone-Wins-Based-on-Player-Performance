@@ -148,12 +148,17 @@ def select_url(website, feature, platform):
     url : string
         String of desired url to be scraped.
     '''
+    #assigning url to cod.tracker.gg with specific platform and feature if cdtr is selected 
     if website == 'cdtr':
-        assert feature in ['Wins', 'Kills', 'Deaths', 'Downs', 'TimePlayed', 'Score', 'ScorePerMinute', 'Contracts', 'Top10'], 'You have not selected a feature from the feature set'
+        #ensure a feature and a platform are selected from the valid options
+        assert feature in ['Wins', 'Kills', 'Deaths', 'Downs', 'TimePlayed', 'Score', 'ScorePerMinute', 'Contracts', 'Top10'], "You have not selected a feature from the feature set"
+        assert platform in ['psn', 'xbl', 'battlenet'], "You have not selected a platform from the platform set"
+        #assign url
         url = f"https://cod.tracker.gg/warzone/leaderboards/battle-royale/{platform}/{feature}?page="
 
+    #assigning url to codstats.net with specific feature if cdst is selected 
     elif website == 'cdst':
-
+        #dictionary containing url extensions for each feature
         url_dict = {'KillsPerMin' : 'kpm/16',
                     'DamageDone' : 'damageDone/161',
                     'DamageTaken' : 'damageTaken/161',
@@ -165,9 +170,10 @@ def select_url(website, feature, platform):
                     'TabletsPickedUp' : 'objectiveBrMissionPickupTablet/161',
                     'TeamSurvival' : 'teamSurvivalTime/161',
                     'Revived' : 'objectiveReviver/161'}
-        
+         
+        #ensure a feature is selected from the valid options
         assert feature in url_dict.keys(), 'You have not selected a feature from the feature set' 
-        
+        #assign url
         url = f"https://codstats.net/warzone/leaderboards/{url_dict[feature]}&page="
 
     else:
@@ -178,7 +184,7 @@ def select_url(website, feature, platform):
 
 
 #4. Cycle through pages and extract player stats
-def scrape_pages(website, feature, scraped_data, platform, start = 1, max_page = 10000):
+def scrape_pages(website, feature, scraped_data, platform, start = 1, max_page = 11000):
     '''
     Cycle through pages of cod.tracker.gg and extract info.
     
@@ -268,13 +274,13 @@ def scrape_pages(website, feature, scraped_data, platform, start = 1, max_page =
         
         #protect against errors by saving whatever data has already been collected
         except:
-            #we go up to 3 attempts to try and scrape the page
-            if retry < 4:
+            #we go up to 5 attempts to try and scrape the page
+            if retry < 6:
                 print(f'Encountered error at page {num}...attempt to re-scrape #{retry}')
                 retry += 1
                 continue
             else:
-                print(f'Encountered error at page {num}...stopped after 3 unsuccessful attempts')
+                print(f'Encountered error at page {num}...stopped after 5 unsuccessful attempts')
                 break 
 
     print(f'Program ended at page {num} for {feature} on {platform} platform(s)')    

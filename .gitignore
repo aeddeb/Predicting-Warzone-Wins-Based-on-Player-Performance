@@ -4,6 +4,7 @@
 #...except
 !cod_scraper.py
 !scraper_functions.py
+!aggregate_data.py
 
 #folder(s)
 /__pycache__/

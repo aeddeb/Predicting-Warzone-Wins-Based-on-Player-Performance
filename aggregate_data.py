@@ -8,13 +8,12 @@ Created on Sat Jul 25 16:32:05 2020
 import os
 import glob
 import pickle
+from tqdm import tqdm
 
 
 
 # Step 1: getting names of all the data files
 os.chdir('./data/')
-
-import glob
 
 #creating list with data file names
 file_list = [file for file in glob.glob("*.pkl")]
@@ -27,10 +26,13 @@ file_list = [file for file in glob.glob("*.pkl")]
 df_dict = {}
 
 #for each file...
-for file in file_names:
+for file in tqdm(file_list):
+    #extracting platform and feature from the file name (needed later)
+    platform = file.replace('.pkl','').split('_')[0]
+    feature = file.replace('.pkl','').split('_')[1]
     
     #grab data from file 
-    with open(f'../data/{file}.pkl', 'rb') as file:
+    with open(file, 'rb') as file:
         data = pickle.load(file)
     
     #if main data dict is empty, then simply add all the data from currently 
@@ -40,21 +42,35 @@ for file in file_names:
     #if not, match players by their name and platform
     else:
         #for each player in the currently loaded data file...
-        for player, stat in tqdm(data.items()):
+        for player, stat in data.items():
             #...if player is in df_dict and platforms are the same
             if player in df_dict and df_dict[player]['platform'] == data[player]['platform']:
                 
-                #if from cdst, only 1 stat
+                #if from cdst (ie. platform is 'all''), only 1 stat to be added
+                if platform == 'all':
+                    df_dict[player][feature] = stat[feature]
                 #if from cdtr, 2 stats (feature and mp)
-                
-                #add wins to df_dict
-                df_dict[player]['wins'] = stat['wins']
+                else:
+                    #add feature and mps to player
+                    df_dict[player][feature] = stat[feature]
+                    df_dict[player][feature + '_mp'] = stat[feature + '_mp']
             
             
-            #...but if not in df_dict, add them in as a new player (note that this will lead in missing values which later need to be imputed)
+            #...but if not in df_dict, add them in as a new player 
+            #note: that this will lead in missing values which later need to be imputed
             else:
-                df_dict[player] = {'platform': stat['platform'], 'wins': stat['wins']}
-           
+                #if from cdst (ie. platform is 'all''), only 1 stat to be added
+                if platform == 'all':
+                    df_dict[player] = {'platform': stat['platform'], 
+                                       feature: stat[feature]
+                                       }
+                #if from cdtr, 2 stats (feature and mp)
+                else:
+                    #add feature and mps to player
+                    df_dict[player] = {'platform': stat['platform'], 
+                                       feature: stat[feature],
+                                       feature + '_mp' : stat[feature + '_mp']
+                                       }
     
     
     

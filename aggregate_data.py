@@ -10,6 +10,42 @@ import glob
 import pickle
 from tqdm import tqdm
 
+#------------------------------------------------------------------------------
+
+#function for adding player info to dictionary of choice
+def add_player_info(data_dict, file_platform, feature, player, stat, player_platform):
+    '''
+    '''
+    #if player already in the data_dict, add their stats
+    if player in data_dict:
+        #if from cdst (ie. platform is 'all''), only 1 stat to be added
+        if file_platform == 'all':
+            data_dict[player][feature] = stat[feature]
+        #if from cdtr, 2 stats (feature and mp) need to be added
+        else:
+            #add feature and mps to player
+            data_dict[player][feature] = stat[feature]
+            data_dict[player][feature + '_mp'] = stat[feature + '_mp']
+    
+    #else player is not in the data_dict needs to be added as a new player
+    else:
+        #if from cdst (ie. platform is 'all''), only 1 stat to be added
+        if file_platform == 'all':
+            data_dict[player] = {'platform': player_platform, 
+                               feature: stat[feature]
+                               }
+        #if from cdtr, 2 stats (feature and mp)
+        else:
+            #add feature and mps to player
+            data_dict[player] = {'platform': player_platform, 
+                               feature: stat[feature],
+                               feature + '_mp' : stat[feature + '_mp']
+                               }
+            
+    return data_dict
+    
+    
+#------------------------------------------------------------------------------
 
 
 # Step 1: getting names of all the data files
@@ -20,58 +56,51 @@ file_list = [file for file in glob.glob("*.pkl")]
 
 
 
-# Step 2: Read in file at a time, add data to master data file
+# Step 2: Read in file at a time, add data to master data file per platform
 
-#initiate main data dictionary
-df_dict = {}
+#initiate main data dictionaries for each platform (ie. psn, xbl, battlenet)
+psn_dict = {}
+xbl_dict = {}
+battlenet_dict = {}
 
 #for each file...
-for file in tqdm(file_list):
+for file_name in tqdm(file_list):
+    
     #extracting platform and feature from the file name (needed later)
-    platform = file.replace('.pkl','').split('_')[0]
-    feature = file.replace('.pkl','').split('_')[1]
+    file_platform = file_name.replace('.pkl','').split('_')[0]
+    feature = file_name.replace('.pkl','').split('_')[1]
     
     #grab data from file 
-    with open(file, 'rb') as file:
+    with open(file_name, 'rb') as file:
         data = pickle.load(file)
     
-    #if main data dict is empty, then simply add all the data from currently 
-    #loaded data
-    if bool(df_dict) == False:
-        df_dict = data.copy()
-    #if not, match players by their name and platform
-    else:
-        #for each player in the currently loaded data file...
-        for player, stat in data.items():
-            #...if player is in df_dict and platforms are the same
-            if player in df_dict and df_dict[player]['platform'] == data[player]['platform']:
-                
-                #if from cdst (ie. platform is 'all''), only 1 stat to be added
-                if platform == 'all':
-                    df_dict[player][feature] = stat[feature]
-                #if from cdtr, 2 stats (feature and mp)
-                else:
-                    #add feature and mps to player
-                    df_dict[player][feature] = stat[feature]
-                    df_dict[player][feature + '_mp'] = stat[feature + '_mp']
-            
-            
-            #...but if not in df_dict, add them in as a new player 
-            #note: that this will lead in missing values which later need to be imputed
-            else:
-                #if from cdst (ie. platform is 'all''), only 1 stat to be added
-                if platform == 'all':
-                    df_dict[player] = {'platform': stat['platform'], 
-                                       feature: stat[feature]
-                                       }
-                #if from cdtr, 2 stats (feature and mp)
-                else:
-                    #add feature and mps to player
-                    df_dict[player] = {'platform': stat['platform'], 
-                                       feature: stat[feature],
-                                       feature + '_mp' : stat[feature + '_mp']
-                                       }
+    #need to add player info to appropriate dict based on their platform 
     
+    #for each player in the currently loaded data file...
+    for player, stat in tqdm(data.items()):
+        
+        #get the player's platform
+        player_platform = stat['platform']
+        
+        #if player plays on playstation, add their info to psn_dict
+        if player_platform == 'psn':
+            psn_dict = add_player_info(psn_dict, file_platform, feature, player,
+                                       stat, player_platform)
+        elif player_platform == 'xbl':
+            xbl_dict = add_player_info(xbl_dict, file_platform, feature, player,
+                           stat, player_platform)
+            
+        elif player_platform == 'battlenet':
+            battlenet_dict = add_player_info(battlenet_dict, file_platform, feature, player,
+               stat, player_platform)
+            
+        else:
+            print(f"For player {player} in file {file_name}, {f{player_platform} is an invalid platform.")
+            
+            
+            
+            
+
     
     
     

@@ -9,6 +9,7 @@ import os
 import glob
 import pickle
 from tqdm import tqdm
+import pandas as pd
 
 #------------------------------------------------------------------------------
 
@@ -40,9 +41,9 @@ def add_player_info(data_dict, file_platform, feature, player, stat, player_plat
     Output
     ------
     data_dict : dictionary with player's info added
-    
+
     '''
-    #if player already in the data_dict, add their stats
+    #if player already exists in data_dict, add their stats
     if player in data_dict:
         #if from cdst (ie. platform is 'all'), only 1 stat to be added
         if file_platform == 'all':
@@ -53,7 +54,7 @@ def add_player_info(data_dict, file_platform, feature, player, stat, player_plat
             data_dict[player][feature] = stat[feature]
             data_dict[player][feature + '_mp'] = stat[feature + '_mp']
     
-    #else player is not in the data_dict and need to be added as a new player
+    #else player is not in the data_dict and needs to be added as a new player
     else:
         #if from cdst (ie. platform is 'all'), only 1 stat to be added
         if file_platform == 'all':
@@ -100,15 +101,15 @@ for file_name in tqdm(file_list):
     with open(file_name, 'rb') as file:
         data = pickle.load(file)
     
-    #need to add player info to appropriate dict based on their platform 
+    #need to add player info to appropriate dict based on their platform: 
     
     #for each player in the currently loaded data file...
-    for player, stat in tqdm(data.items()):
+    for player, stat in data.items():
         
         #get the player's platform
         player_platform = stat['platform']
         
-        #if player plays on playstation, add their info to psn_dict
+        #add the player to the appropriate dict based on their platform
         if player_platform == 'psn':
             psn_dict = add_player_info(psn_dict, file_platform, feature, player,
                                        stat, player_platform)
@@ -121,17 +122,25 @@ for file_name in tqdm(file_list):
                stat, player_platform)
             
         else:
-            print(f"For player {player} in file {file_name}, {f{player_platform} is an invalid platform.")
+            print(f"For player {player} in file {file_name}, {player_platform} is an invalid platform.")
             
             
+'''            
+At this point the dictionaries contain all the player data.
             
-            
+Next, need to take the data from the dictionaries and put them into pandas
+dataframes. Then concat the 3 pd dfs.
+'''
 
-    
-    
-    
-    
-    
-    
-    
-    
+
+# 1. Data from dict to pd Df
+
+#psn_df = pd.DataFrame.from_dict(psn_dict).T
+#xbl_df = pd.DataFrame.from_dict(xbl_dict).T
+#battlenet_df = pd.DataFrame.from_dict(battlenet_dict).T
+
+
+
+# 2. Then concatenate the 3 dfs
+
+#df = pd.concat([psn_dict, xbl_dict, battlenet_dict], ignore_index = True)

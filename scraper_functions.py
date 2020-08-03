@@ -137,7 +137,7 @@ def select_url(website, feature, platform):
             'Wins', 'Kills', 'Deaths', 'Downs', 'TimePlayed', 'Score', 'ScorePerMinute', 'Contracts', or 'Top10'.
         For cdst, options are:
             'KillsPerMin', 'DamageDone', 'DamageTaken', 'HeadshotsPercentage', 'TimeMoving', 'LastStandKills',
-            'CachesOpened', 'KioskPurchases', 'TabletsPickedUp', 'TeamSurvival', or 'Revived'.  
+            'CachesOpened', 'KioskPurchases', 'TeamSurvival', or 'Revived'.  
     platform : str (Optional)
         String of the desired platform. Only needed if website is cdtr. Otherwise, not used.
         Options for 'cdtr':
@@ -167,7 +167,6 @@ def select_url(website, feature, platform):
                     'LastStandKills' : 'objectiveLastStandKill/161',
                     'CachesOpened' : 'objectiveBrCacheOpen/161',
                     'KioskPurchases' : 'objectiveBrKioskBuy/161',
-                    'TabletsPickedUp' : 'objectiveBrMissionPickupTablet/161',
                     'TeamSurvival' : 'teamSurvivalTime/161',
                     'Revived' : 'objectiveReviver/161'}
          

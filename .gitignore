@@ -11,9 +11,10 @@
 /data/
 /.ipynb_checkpoints/
 /archive/
+/notebooks/
 
 #other
 notes.txt
 scraping_log.xlsx
-/notebooks/.ipynb_checkpoints/
-/notebooks/Data_loading.ipynb
+#/notebooks/.ipynb_checkpoints/
+#/notebooks/Data_loading.ipynb

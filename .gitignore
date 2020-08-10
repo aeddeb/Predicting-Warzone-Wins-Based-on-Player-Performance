@@ -5,6 +5,7 @@
 !cod_scraper.py
 !scraper_functions.py
 !aggregate_data.py
+!/scraper/create_database.py
 
 #folder(s)
 /__pycache__/

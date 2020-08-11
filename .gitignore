@@ -1,12 +1,3 @@
-#ignore py files...
-*.py
-
-#...except
-!cod_scraper.py
-!scraper_functions.py
-!aggregate_data.py
-!/scraper/create_database.py
-
 #folder(s)
 /__pycache__/
 /data/
@@ -16,6 +7,5 @@
 
 #other
 notes.txt
-scraping_log.xlsx
 #/notebooks/.ipynb_checkpoints/
 #/notebooks/Data_loading.ipynb

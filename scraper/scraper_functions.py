@@ -43,20 +43,34 @@ def get_players(scraped_page, platform):
         #Checking if the player is on battlenet or not...
         #...if not...
         if platform != 'battlenet':
-            username = data[player].find('span', attrs = {'class':'trn-ign__username'}).text
+            
+            username = players[player].find('span', attrs = {'class':'trn-ign__username'}).text
             #...add player to usernames list
             usernames.append(username)
 
         #...otherwise, we need to add the special player id onto the username to get the full battlenet id
         else:
-            name = data[player].find('span', attrs = {'class':'trn-ign__username'}).text 
+            #get player name
+            name = players[player].find('span', attrs = {'class':'trn-ign__username'}).text 
+            #get player id, if exists
             try:
-                player_id = data[player].find('span', attrs = {'class':'trn-ign__discriminator'}).text
+                player_id = players[player].find('span', attrs = {'class':'trn-ign__discriminator'}).text
                 username = name + player_id
+                #get the url equivalent of the username
                 url_username = name + player_id.replace('#', '%')
-                usernames[username] = url_username
+            #otherwise the player id is already embedded in the username
             except:
                 username = name
+                #get the url equivalent of the username
                 url_username = name.replace('#', '%')
+            #put the username and url_username into the usernames dict
+            usernames[username] = url_username
 
     return usernames
+
+
+
+def scrape_overview():
+    '''
+    '''
+    

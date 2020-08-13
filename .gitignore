@@ -9,3 +9,7 @@
 notes.txt
 #/notebooks/.ipynb_checkpoints/
 #/notebooks/Data_loading.ipynb
+
+#scraper
+/scraper/battlenet_usernames.png
+/scraper/selenium_dev.py

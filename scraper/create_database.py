@@ -78,7 +78,6 @@ def main():
                                     score_per_game real,
                                     score_per_min real,
                                     contracts integer,
-                                    multiplayer integer,  /* if they played multiplayer or not (boolean) */
                                     scrape_id integer NOT NULL,
                                     FOREIGN KEY (scrape_id) REFERENCES scrape_log (session_id), 
                                     FOREIGN KEY (player_id) REFERENCES players (id)

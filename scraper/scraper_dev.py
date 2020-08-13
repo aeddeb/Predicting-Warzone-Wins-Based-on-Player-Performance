@@ -83,17 +83,6 @@ Win % : 0.7%
 
 '''
 
-#determine if they have played multiplayer or not
-mp_text = "This player has played regular MW Multiplayer. Their weapon/killstreak stats are a combination of Warzone and MW Multiplayer data. "
-    
-if mp_text in soup.text:
-    print('player has played multiplayer')
-    
 
-driver.quit()
-
-#2 options: 1) get match data from multiplayer to account for games played in mp
-            #2) ignore this variable 
-    
     
     

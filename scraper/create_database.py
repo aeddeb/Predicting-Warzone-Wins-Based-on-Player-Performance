@@ -116,7 +116,9 @@ def main():
     sql_create_scrapelog_table = """ CREATE TABLE IF NOT EXISTS scrape_log (
                                         session_id integer PRIMARY KEY,
                                         start_date text NOT NULL,
-                                        end_date text NOT NULL
+                                        end_date text NOT NULL,
+                                        num_players int NOT NULL,
+                                        num_pages int NOT NULL
                                     ); """
 
     # create a database connection

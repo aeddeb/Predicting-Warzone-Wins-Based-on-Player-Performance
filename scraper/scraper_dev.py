@@ -37,8 +37,6 @@ soup = BeautifulSoup(page, 'html.parser')
 
 # 1. Overview
 
-# 1.1. Overview  - overall BR stats
-
 print('Getting overall player stats')
 #getting the overview
 for parent in soup.find('h2', text = 'Battle Royale').parents:
@@ -138,18 +136,17 @@ notice = soup.find('div', attrs = {'class' : 'notice'})
 if notice:
     has_played_last_week = False
 
-
-#get the game modes 
-game_modes = soup_modes.find_all('div', attrs = {'class' : 'segment-stats card bordered responsive'})
-#list of game types (of interest)
+#assigning list for relevant game types
 game_types = ['BR Quads', 'BR Trios', 'BR Duos', 'BR Solos']
 #saving weekly data in another dict
 weekly_player_stats = {}
 
-
 #get weekly stats if player has played in past week
 if has_played_last_week:
     
+    #get the game modes 
+    game_modes = soup_modes.find_all('div', attrs = {'class' : 'segment-stats card bordered responsive'})
+
     for game_mode in game_modes:
         
          game_type = game_mode.find('div', attrs = {'class' : 'title'}).find('h2').text
@@ -165,9 +162,6 @@ if has_played_last_week:
                  value = stat.find('span', attrs = {'class' : 'value'}).text
                  weekly_player_stats[game_type][name] = value
 
-else:
-    for game_type in game_types:
-        weekly_player_stats[game_type] = {'Matches Played' : 0}
         
 #Scenario 2: need to check if they played at least 1 of the relevant BR game modes
 #we know that weekly_player_stats will be empty so let's check

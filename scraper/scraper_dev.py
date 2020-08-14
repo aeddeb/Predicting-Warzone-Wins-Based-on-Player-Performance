@@ -8,6 +8,7 @@ Created on Mon Aug 10 17:12:20 2020
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
+import time
 
 options = Options()
 #run headless (ie. without GUI)
@@ -15,14 +16,17 @@ options.headless = True
 DRIVER_PATH = 'chromedriver.exe'
 driver = webdriver.Chrome(options=options, executable_path=DRIVER_PATH)
 
-
-driver.get("https://cod.tracker.gg/warzone/profile/xbl/BrownMagicGT/overview")
+url = "https://cod.tracker.gg/warzone/profile/psn/gamergirlsence/overview"
+print("fetching webpage")
+#get html for player
+driver.get(url)
+print('webpage fetched')
 
 page = driver.page_source
 
 soup = BeautifulSoup(page, 'html.parser')
 
-driver.quit()
+#driver.quit()
 
 
 #------------------------------------------------------------------------------
@@ -64,7 +68,7 @@ for stat in stats:
     player_data[name] = value
     
 '''
-SAMPLE OUTPUT:
+SAMPLE OUTPUT (player_data):
 
 Wins : 1
 Top 5 : 7
@@ -84,5 +88,64 @@ Win % : 0.7%
 '''
 
 
+
+# 2. Weekly Stats
+
+'''
+Tasks for modes page:
     
+1. Get stats
+
+2. Identify which game modes player has played in past week
+    - if player has not played a certain game mode, matches played = 0 and 
+    corresponding stats will be null
     
+3. Check for "This player has not played Warzone in the past week."
+
+'''
+
+#navigate to 'modes' page for player
+link = driver.find_element_by_link_text('Modes')
+link.click()
+time.sleep(2)
+#get page source (ie. raw html)
+modes_page = driver.page_source
+
+#create soup onject for modes page
+soup_modes = BeautifulSoup(modes_page, 'html.parser')
+
+#get the game modes 
+game_modes = soup_modes.find_all('div', attrs = {'class' : 'segment-stats card bordered responsive'})
+#list of game types (of interest)
+game_types = ['BR Quads', 'BR Trios', 'BR Duos', 'BR Solos']
+
+#saving weekly data in another dict
+weekly_player_stats = {}
+
+#get weekly stats
+for game_mode in game_modes:
+    
+     game_type = game_mode.find('div', attrs = {'class' : 'title'}).find('h2').text
+     if game_type in game_types:
+         
+         #get matches played
+         mp = game_mode.find('span', attrs = {'class' : 'matches'}).text.replace('Matches','').strip()
+         weekly_player_stats[game_type] = {'Matches Played' : mp}
+         
+         #get all the other weekly stats for the game type
+         for stat in game_mode.find_all('div', attrs ={'class' : 'numbers'}):
+             name = stat.find('span', attrs = {'class' : 'name'}).text
+             value = stat.find('span', attrs = {'class' : 'value'}).text
+             weekly_player_stats[game_type][name] = value
+     else:
+         continue
+
+#if a player did not play a game mode, assign matches played for that mode to 0
+for game_type in game_types:
+    if game_type not in weekly_player_stats:
+        weekly_player_stats[game_type] = {'Matches Played' : 0}
+
+
+
+
+driver.quit()

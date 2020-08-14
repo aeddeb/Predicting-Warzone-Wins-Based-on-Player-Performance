@@ -17,6 +17,7 @@ DRIVER_PATH = 'chromedriver.exe'
 driver = webdriver.Chrome(options=options, executable_path=DRIVER_PATH)
 
 url = "https://cod.tracker.gg/warzone/profile/psn/gamergirlsence/overview"
+
 print("fetching webpage")
 #get html for player
 driver.get(url)
@@ -28,14 +29,17 @@ soup = BeautifulSoup(page, 'html.parser')
 
 #driver.quit()
 
+#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-#Finding Elements
+
+#Finding Player Stats
 
 # 1. Overview
 
 # 1.1. Overview  - overall BR stats
 
+print('Getting overall player stats')
 #getting the overview
 for parent in soup.find('h2', text = 'Battle Royale').parents:
     if parent.name == 'div' and parent.has_attr("class"):
@@ -66,7 +70,7 @@ for stat in stats:
     value = stat.find('span', attrs =  {'class' : "value"}).text
     #add player stat to player_data
     player_data[name] = value
-    
+
 '''
 SAMPLE OUTPUT (player_data):
 
@@ -87,7 +91,9 @@ Win % : 0.7%
 
 '''
 
+print('Overall player stats collected')
 
+#------------------------------------------------------------------------------
 
 # 2. Weekly Stats
 
@@ -103,49 +109,83 @@ Tasks for modes page:
 3. Check for "This player has not played Warzone in the past week."
 
 '''
-
+print('Fetching modes webpage')
 #navigate to 'modes' page for player
 link = driver.find_element_by_link_text('Modes')
 link.click()
-time.sleep(2)
+time.sleep(1)
 #get page source (ie. raw html)
 modes_page = driver.page_source
-
+print('webpage fetched')
 #create soup onject for modes page
 soup_modes = BeautifulSoup(modes_page, 'html.parser')
+
+print('Getting weekly player stats')
+#by default, assuming player has played at least 1 match in the past week
+has_played_last_week = True
+
+'''
+Two scenarios where player does not have weekly stats:
+    1. Notice that says they did not play
+    2. They played games but none of the main BR types
+    
+notice_message = '\n    This player has not played Warzone in the past week.\n  '
+'''
+
+#checking for scenario 1
+notice = soup.find('div', attrs = {'class' : 'notice'})
+#if a notice exists, player has no past weekly matches
+if notice:
+    has_played_last_week = False
+
 
 #get the game modes 
 game_modes = soup_modes.find_all('div', attrs = {'class' : 'segment-stats card bordered responsive'})
 #list of game types (of interest)
 game_types = ['BR Quads', 'BR Trios', 'BR Duos', 'BR Solos']
-
 #saving weekly data in another dict
 weekly_player_stats = {}
 
-#get weekly stats
-for game_mode in game_modes:
+
+#get weekly stats if player has played in past week
+if has_played_last_week:
     
-     game_type = game_mode.find('div', attrs = {'class' : 'title'}).find('h2').text
-     if game_type in game_types:
-         
-         #get matches played
-         mp = game_mode.find('span', attrs = {'class' : 'matches'}).text.replace('Matches','').strip()
-         weekly_player_stats[game_type] = {'Matches Played' : mp}
-         
-         #get all the other weekly stats for the game type
-         for stat in game_mode.find_all('div', attrs ={'class' : 'numbers'}):
-             name = stat.find('span', attrs = {'class' : 'name'}).text
-             value = stat.find('span', attrs = {'class' : 'value'}).text
-             weekly_player_stats[game_type][name] = value
-     else:
-         continue
+    for game_mode in game_modes:
+        
+         game_type = game_mode.find('div', attrs = {'class' : 'title'}).find('h2').text
+         if game_type in game_types:
+             
+             #get matches played
+             mp = game_mode.find('span', attrs = {'class' : 'matches'}).text.replace('Matches','').strip()
+             weekly_player_stats[game_type] = {'Matches Played' : mp}
+             
+             #get all the other weekly stats for the game type
+             for stat in game_mode.find_all('div', attrs ={'class' : 'numbers'}):
+                 name = stat.find('span', attrs = {'class' : 'name'}).text
+                 value = stat.find('span', attrs = {'class' : 'value'}).text
+                 weekly_player_stats[game_type][name] = value
 
-#if a player did not play a game mode, assign matches played for that mode to 0
-for game_type in game_types:
-    if game_type not in weekly_player_stats:
+else:
+    for game_type in game_types:
         weekly_player_stats[game_type] = {'Matches Played' : 0}
+        
+#Scenario 2: need to check if they played at least 1 of the relevant BR game modes
+#we know that weekly_player_stats will be empty so let's check
+if bool(weekly_player_stats) == False:
+    has_played_last_week = False
 
 
+#if player has played last week and at least 1 match in 1 of the 4 relevant game types
+if has_played_last_week:
+    #if a player did not play a game mode, assign matches played for that mode to 0
+    for game_type in game_types:
+        if game_type not in weekly_player_stats:
+            weekly_player_stats[game_type] = {'Matches Played' : 0}
+#otherwise, they did not play a match in any of the 4 relevant game types
+else:
+     for game_type in game_types:
+        weekly_player_stats[game_type] = {'Matches Played' : 0}   
 
+print('Weekly player stats fetched')
 
 driver.quit()

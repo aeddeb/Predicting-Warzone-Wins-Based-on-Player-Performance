@@ -5,27 +5,30 @@ Created on Mon Aug 10 17:12:20 2020
 @author: ali_e
 """
 
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+#------------------------------------------------------------------------------
+#Import Libraries
+
+import requests
 from bs4 import BeautifulSoup
 import time
+#------------------------------------------------------------------------------
+#Retrieve webpage
 
-options = Options()
-#run headless (ie. without GUI)
-options.headless = True
-DRIVER_PATH = 'chromedriver.exe'
-driver = webdriver.Chrome(options=options, executable_path=DRIVER_PATH)
+#specify player username and platform
+player_name = "Thazul91"
+platform = "psn"
+#urls
+overview_url = f"https://cod.tracker.gg/warzone/profile/{platform}/{player_name}/overview"
+modes_url = f"https://cod.tracker.gg/warzone/profile/{platform}/{player_name}/modes"
+matches_url = f"https://cod.tracker.gg/warzone/profile/{platform}/{player_name}/matches"
 
-url = "https://cod.tracker.gg/warzone/profile/psn/gamergirlsence/overview"
 
 print("fetching webpage")
 #get html for player
-driver.get(url)
+overview_page = requests.get(overview_url)
 print('webpage fetched')
 
-page = driver.page_source
-
-soup = BeautifulSoup(page, 'html.parser')
+soup = BeautifulSoup(overview_page.content, 'html.parser')
 
 #driver.quit()
 
@@ -109,14 +112,12 @@ Tasks for modes page:
 '''
 print('Fetching modes webpage')
 #navigate to 'modes' page for player
-link = driver.find_element_by_link_text('Modes')
-link.click()
-time.sleep(1)
-#get page source (ie. raw html)
-modes_page = driver.page_source
-print('webpage fetched')
-#create soup onject for modes page
-soup_modes = BeautifulSoup(modes_page, 'html.parser')
+modes_page = requests.get(modes_url)
+print('modes webpage fetched')
+    
+#create soup object for modes page
+soup_modes = BeautifulSoup(modes_page.content, 'html.parser')
+print(soup_modes.find('title').text)
 
 print('Getting weekly player stats')
 #by default, assuming player has played at least 1 match in the past week
@@ -131,9 +132,9 @@ notice_message = '\n    This player has not played Warzone in the past week.\n  
 '''
 
 #checking for scenario 1
-notice = soup.find('div', attrs = {'class' : 'notice'})
+stats_available = soup_modes.find('div', attrs = {'class' : 'segment-stats card bordered responsive'})
 #if a notice exists, player has no past weekly matches
-if notice:
+if not stats_available:
     has_played_last_week = False
 
 #assigning list for relevant game types
@@ -142,7 +143,7 @@ game_types = ['BR Quads', 'BR Trios', 'BR Duos', 'BR Solos']
 weekly_player_stats = {}
 
 #get weekly stats if player has played in past week
-if has_played_last_week:
+if has_played_last_week == True:
     
     #get the game modes 
     game_modes = soup_modes.find_all('div', attrs = {'class' : 'segment-stats card bordered responsive'})
@@ -150,6 +151,7 @@ if has_played_last_week:
     for game_mode in game_modes:
         
          game_type = game_mode.find('div', attrs = {'class' : 'title'}).find('h2').text
+         print(game_type)
          if game_type in game_types:
              
              #get matches played
@@ -168,7 +170,6 @@ if has_played_last_week:
 if bool(weekly_player_stats) == False:
     has_played_last_week = False
 
-
 #if player has played last week and at least 1 match in 1 of the 4 relevant game types
 if has_played_last_week:
     #if a player did not play a game mode, assign matches played for that mode to 0
@@ -182,4 +183,9 @@ else:
 
 print('Weekly player stats fetched')
 
-driver.quit()
+#------------------------------------------------------------------------------
+
+# 3. Matches  page --> Weekly Stats
+'''
+Get match information from the past week
+'''

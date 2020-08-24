@@ -21,6 +21,13 @@ def get_players(scraped_page, platform):
 
     platform: string
         Contains the name of the platform the players play on.
+
+    OUTPUT
+    ------
+    usernames : dictionary of usernames as keys with their url equivalent as values
+
+    Note: url equivalent is only different from username if the platform is battlenet
+    -url uses % instead of #
     '''
     #create beautifulsoup object
     soup = BeautifulSoup(scraped_page, 'html.parser')
@@ -29,13 +36,8 @@ def get_players(scraped_page, platform):
     players = soup.find_all('td', attrs = {'class' : 'username'})
 
 
-    #instantiate dictionary to save player usernames and corresponding url equivalent if platform is battlenet
-    if platform == 'battlenet':
-        usernames = {}
-    #otherwise, save the player usernames in a list
-    else:
-        usernames = []
-
+    #instantiate dictionary to save player usernames and corresponding url equivalent (only varies if platform is battlenet)
+    usernames = {}
 
     #for each player on the page...
     for player in range(len(players)):
@@ -43,10 +45,10 @@ def get_players(scraped_page, platform):
         #Checking if the player is on battlenet or not...
         #...if not...
         if platform != 'battlenet':
-            
+            #get username
             username = players[player].find('span', attrs = {'class':'trn-ign__username'}).text
-            #...add player to usernames list
-            usernames.append(username)
+            #...add player to usernames dict
+            usernames[username] = username
 
         #...otherwise, we need to add the special player id onto the username to get the full battlenet id
         else:
